@@ -3,21 +3,18 @@ package MapReducers
 import HelperUtils.HelperFunctions.filterLogMessagesOnly
 import HelperUtils.Parameters
 import MapReducers.MapReducerJob.runJob
-import org.apache.hadoop.io.{IntWritable, LongWritable, Text}
-import org.apache.hadoop.mapred.{MapReduceBase, Mapper, OutputCollector, Reducer, Reporter}
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.conf.*
-import org.apache.hadoop.io.*
-import org.apache.hadoop.util.*
-import org.apache.hadoop.mapred.*
-
-import java.time.format.DateTimeFormatter
-import java.time.LocalTime
 import com.google.gson.*
+import org.apache.hadoop.conf.*
+import org.apache.hadoop.fs.Path
+import org.apache.hadoop.io.*
+import org.apache.hadoop.mapred.*
+import org.apache.hadoop.util.*
 
-import scala.jdk.CollectionConverters.*
 import java.io.IOException
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util
+import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
 
@@ -73,16 +70,26 @@ object MaxCharCountMapReduce :
       max.set(values.asScala.map(str => str.get()).max) // take the maximum value
       output.collect(key, max)
 
-  @main def runMaxCharCountMapReduce: String =
+  /**
+   * runs the job
+   *
+   * @param inputPath  the input path of the job
+   * @param outputPath the output path of the job
+   * @return the output of the job as a string
+   */
+  def run(inputPath : String, outputPath : String): String =
 
     // first line of the csv file to show
     val firstLine = "Message Type, number of char"
+    val jobName = this.getClass.getName.replace("$", "")
 
-    runJob(this.getClass.getName,
+    runJob(jobName,
       classOf[IntWritable],
       classOf[TextOutputFormat[Text, IntWritable]],
       classOf[Map],
       classOf[Reduce],
-      firstLine = firstLine
+      firstLine = firstLine,
+      inputPath = inputPath,
+      outputPath = s"$outputPath/$jobName.csv"
     )
 

@@ -1,5 +1,5 @@
-import HelperUtils.Parameters
 import HelperUtils.HelperFunctions.{generate, generateRandomTimestamp}
+import HelperUtils.Parameters
 import MapReducers.MaxCharCountMapReduce
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.hadoop.mapred.TextOutputFormat
@@ -24,8 +24,8 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
   private val outputFormatClass = classOf[TextOutputFormat[Text, IntWritable]]
   private val mapperClass = classOf[MapReducers.MaxCharCountMapReduce.Map]
   private val reducerClass = classOf[MapReducers.MaxCharCountMapReduce.Reduce]
-  private val inputPath = "log/" + jobName
-  private val outputPath = jobName
+  private val inputPath = s"log/$jobName"
+  private val outputPath = s"log_output/$jobName"
   private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
@@ -36,7 +36,7 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file that generates for each time interval two right timestamps and two wrong timestamps
 

@@ -2,23 +2,19 @@ package MapReducers
 
 import HelperUtils.HelperFunctions.filterLogMessagesOnly
 import HelperUtils.Parameters
-import MapReducers.ErrorTimeIntervalsMapReducer.{Map, Reduce}
 import MapReducers.MapReducerJob.runJob
-import org.apache.hadoop.io.{IntWritable, LongWritable, Text}
-import org.apache.hadoop.mapred.{MapReduceBase, Mapper, OutputCollector, Reducer, Reporter}
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.conf.*
-import org.apache.hadoop.io.*
-import org.apache.hadoop.util.*
-import org.apache.hadoop.mapred.*
-
-import java.time.format.DateTimeFormatter
-import java.time.LocalTime
 import com.google.gson.*
+import org.apache.hadoop.conf.*
+import org.apache.hadoop.fs.Path
+import org.apache.hadoop.io.*
+import org.apache.hadoop.mapred.*
+import org.apache.hadoop.util.*
 
-import scala.jdk.CollectionConverters.*
 import java.io.IOException
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util
+import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
 
@@ -64,16 +60,26 @@ object TypeCounterMapReducer :
       sum.set( values.asScala.map(int => int.get()).sum )// sum all the types of messages previously collected
       output.collect(key, sum)
 
-  @main def runTypeCounterMapReducer: String =
+  /**
+   * runs the job
+   *
+   * @param inputPath  the input path of the job
+   * @param outputPath the output path of the job
+   * @return the output of the job as a string
+   */
+  def run(inputPath : String, outputPath : String): String =
 
     // first line of the csv file to show
     val firstLine = "Message type, number of occurrences"
+    val jobName = this.getClass.getName.replace("$", "")
 
-    runJob(this.getClass.getName,
+    runJob(jobName,
       classOf[IntWritable],
       classOf[TextOutputFormat[Text, IntWritable]],
       classOf[Map],
       classOf[Reduce],
-      firstLine = firstLine
+      firstLine = firstLine,
+      inputPath = inputPath,
+      outputPath = s"$outputPath/$jobName.csv"
     )
 

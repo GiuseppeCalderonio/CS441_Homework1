@@ -1,5 +1,5 @@
-import HelperUtils.Parameters
 import HelperUtils.HelperFunctions.{generate, generateRandomTimestamp}
+import HelperUtils.Parameters
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.hadoop.mapred.TextOutputFormat
 import org.scalatest.PrivateMethodTester
@@ -22,8 +22,8 @@ class TypeCounterMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
   private val outputFormatClass = classOf[TextOutputFormat[Text, IntWritable]]
   private val mapperClass = classOf[MapReducers.TypeCounterMapReducer.Map]
   private val reducerClass = classOf[MapReducers.TypeCounterMapReducer.Reduce]
-  private val inputPath = "log/" + jobName
-  private val outputPath = jobName
+  private val inputPath = s"log/$jobName"
+  private val outputPath = s"log_output/$jobName"
   private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
@@ -34,7 +34,7 @@ class TypeCounterMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file that contains all kind of combinations between belonging to time intervals and pattern regexp
 

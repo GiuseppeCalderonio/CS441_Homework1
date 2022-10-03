@@ -1,4 +1,4 @@
-import HelperUtils.HelperFunctions.{generateRandomTimestamp, generate}
+import HelperUtils.HelperFunctions.{generate, generateRandomTimestamp}
 import HelperUtils.Parameters
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapred.TextOutputFormat
@@ -10,8 +10,8 @@ import java.io.{BufferedWriter, File, FileWriter, PrintWriter}
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import javax.print.attribute.standard.JobName
-import scala.util.Random
 import scala.io.Source
+import scala.util.Random
 
 /**
  * This test class verifies that the Statistical Map Reducer component works correctly
@@ -31,8 +31,8 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
   private val outputFormatClass = classOf[TextOutputFormat[Text, Text]]
   private val mapperClass = classOf[MapReducers.StatisticalMapReducer.Map]
   private val reducerClass = classOf[MapReducers.StatisticalMapReducer.Reduce]
-  private val inputPath = "log/" + jobName
-  private val outputPath = jobName
+  private val inputPath = s"log/$jobName"
+  private val outputPath = s"log_output/$jobName"
   private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
@@ -44,7 +44,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file with 5 log messages, all in the first time interval, where only 3 of them match with the regexp pattern
 
@@ -89,7 +89,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file that generates for each time interval two right timestamps and two wrong timestamps
 

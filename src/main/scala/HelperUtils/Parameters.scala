@@ -1,17 +1,13 @@
 package HelperUtils
 
+import HelperUtils.ReadProperties.PropFileReader
 import com.typesafe.config.Config
 
-import scala.collection.immutable.ListMap
-import scala.util.{Failure, Success, Try}
-import scala.jdk.CollectionConverters.*
-import java.time.format.DateTimeFormatter
 import java.time.LocalTime
-import java.time.format.DateTimeParseException
-
-
-
-
+import java.time.format.{DateTimeFormatter, DateTimeParseException}
+import scala.collection.immutable.ListMap
+import scala.jdk.CollectionConverters.*
+import scala.util.{Failure, Success, Try}
 
 /**
  * This module obtains configuration parameter values from application.conf and converts them
@@ -20,12 +16,22 @@ import java.time.format.DateTimeParseException
  * The implementation follows the same structure of the Parameters class of the LogGeneration project
  *
  */
-object Parameters:
+object Parameters :
+
+  /**
+   * This value is used to locate the configuration name at the root of the .config file
+   */
+  private val configName = "Homework1Config"
+
+  /**
+   * this value is used for logging purposes
+   */
+  private val logger = CreateLogger(classOf[Parameters.type])
 
   /**
    * this value represents the object used to access the .config file
    */
-  private val config = ObtainConfigReference("randomLogGenerator") match {
+  private val config = ObtainConfigReference("Homework1Config") match {
     case Some(value) => value
     case None => throw new RuntimeException("Cannot obtain a reference to the config data.")
   }
@@ -41,18 +47,25 @@ object Parameters:
    */
   private def timeIntervals(startTimeIntervalsStrings: List[String], endTimeIntervalsStrings: List[String]): List[(LocalTime, LocalTime)] =
 
-    if startTimeIntervalsStrings.length != endTimeIntervalsStrings.length then throw new IllegalArgumentException("Incorrect setting of time intervals : number of elements of the two lists are not equal, they should be equal")
+    if startTimeIntervalsStrings.length != endTimeIntervalsStrings.length then {
+      logger.error(s"number of elements of the two lists are not equal, they should be equal")
+      throw new IllegalArgumentException("Incorrect setting of time intervals : number of elements of the two lists are not equal, they should be equal")
+    }
 
     try{
       val startTimeIntervals = startTimeIntervalsStrings.map(LocalTime.parse(_, DateTimeFormatter.ofPattern("HH:mm:ss.SSS")))
       val endTimeIntervals = endTimeIntervalsStrings.map(LocalTime.parse(_, DateTimeFormatter.ofPattern("HH:mm:ss.SSS")))
 
       val intervals = startTimeIntervals.zip(endTimeIntervals)
-      if intervals.exists(t => t._1.isAfter(t._2)) then throw new IllegalArgumentException("Incorrect setting of time intervals : start interval must be lower than end interval")
+      if intervals.exists(t => t._1.isAfter(t._2)) then {
+        logger.error(s"start interval must be lower than end interval")
+        throw new IllegalArgumentException("Incorrect setting of time intervals : start interval must be lower than end interval")
+      }
       intervals
 
     } catch {
-      case _ : DateTimeParseException => throw new IllegalArgumentException("Incorrect setting of time intervals : format should be \"HH:mm:ss.SSS\"")
+      case _ : DateTimeParseException => logger.error(s"format should be \"HH:mm:ss.SSS\"")
+        throw new IllegalArgumentException("Incorrect setting of time intervals : format should be \"HH:mm:ss.SSS\"")
     }
 
   end timeIntervals
@@ -67,9 +80,9 @@ object Parameters:
    * @return
    */
   private def getStringListSafe(stringListName : String): List[String] =
-    Try(config.getStringList(s"randomLogGenerator.$stringListName").asScala.toList) match {
+    Try(config.getStringList(s"$configName.$stringListName").asScala.toList) match {
       case Success(value) => value.sorted // this line automatically sorts the list in such a way that timestamps are sorted as a consequence
-      case Failure(_) => System.err.println(s"No config parameter $stringListName is provided")
+      case Failure(_) => logger.error(s"No config parameter $stringListName is provided")
         throw new IllegalArgumentException(s"No config data for $stringListName")
     }
   end getStringListSafe
@@ -106,9 +119,9 @@ object Parameters:
    */
   private def getParam(pName: String, defaultVal: String): String =
 
-    Try(config.getString(s"randomLogGenerator.$pName")) match {
+    Try(config.getString(s"$configName.$pName")) match {
       case Success(value) => value
-      case Failure(_) => System.out.println(s"No config parameter $pName is provided. Defaulting to $defaultVal")
+      case Failure(_) => logger.warn(s"No config parameter $pName is provided. Defaulting to $defaultVal")
         defaultVal
     }
   end getParam
@@ -117,15 +130,15 @@ object Parameters:
   /**
    * these values represent the public interface of the object Parameters
    * the description of each of them can be found in the .config file (should be located in the src/main/resources folder)
+   * these values can't be changed once the jar is created
    */
 
   val generatingPattern: String = getParam("Pattern", "([a-c][e-g][0-3]|[A-Z][5-9][f-w]){5,15}")
-  val inputPath: String = getParam("inputPath", "log/LogFileGenerator.2022-09-14.log")
-  val outputPath: String = getParam("outputPath" , "log_out/Map_Reduce_Output")
   val messageTypes: String = getParam("messageTypes","(INFO|WARN|ERROR|DEBUG)")
+  val timeRegexp: String = getParam("timeRegexp", "([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{3})")
+  val tempDir: String = getParam("tempDir", "temp1/")
+  val nMappers: String = getParam("nMappers", "1")
+  val nReducers: String = getParam("nReducers", "1")
   val timeIntervals: List[(LocalTime, LocalTime)] = getTimeIntervals("startingTimeIntervals", "endingTimeIntervals")
   val testTimeIntervals: List[(LocalTime, LocalTime)] = getTimeIntervals("testStartingTimeIntervals", "testEndingTimeIntervals")
-  val timeRegexp: String = getParam("timeRegexp", "([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{3})")
-  val outputDirectory: String = getParam("outputDirectory", "log_output")
-  val tempDir: String = getParam("tempDir", "temp/")
 

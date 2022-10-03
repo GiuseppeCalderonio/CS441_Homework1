@@ -2,20 +2,19 @@ package MapReducers
 
 import HelperUtils.HelperFunctions.filterLogMessagesOnly
 import HelperUtils.Parameters
-import MapReducerJob.runJob
-import org.apache.hadoop.io.{ArrayWritable, IntWritable, LongWritable, Text, Writable}
-import org.apache.hadoop.mapred.{MapReduceBase, Mapper, OutputCollector, Reducer, Reporter}
-import org.apache.hadoop.fs.Path
+import MapReducers.MapReducerJob.runJob
 import org.apache.hadoop.conf.*
+import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io
-import org.apache.hadoop.util.*
+import org.apache.hadoop.io.*
 import org.apache.hadoop.mapred.*
+import org.apache.hadoop.util.*
 
-import java.time.format.DateTimeFormatter
-import java.time.LocalTime
-import scala.jdk.CollectionConverters.*
 import java.io.{DataInput, DataOutput, IOException}
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util
+import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
 /**
@@ -94,6 +93,7 @@ object StatisticalMapReducer :
 
     }
 
+
     @throws[IOException]
     def map(key: LongWritable, value: Text, output: OutputCollector[Text, Text], reporter: Reporter): Unit =
 
@@ -129,15 +129,25 @@ object StatisticalMapReducer :
       output.collect(key, writeT(sum))
 
 
-  @main def runStatisticalMapReducer: String =
+  /**
+   * runs the job
+   *
+   * @param inputPath  the input path of the job
+   * @param outputPath the output path of the job
+   * @return the output of the job as a string
+   */
+  def run(inputPath : String, outputPath : String): String =
 
     // first line of the csv file to show
     val firstLine = "MessageType" + "," + Parameters.timeIntervals.map( t => "belonging to [" + t._1 + ";" + t._2 + "]").reduce( (s1, s2)  => s1 + "," + s2 )
+    val jobName = this.getClass.getName.replace("$", "")
 
-    runJob(this.getClass.getName,
+    runJob(jobName,
       classOf[Text],
       classOf[TextOutputFormat[Text, Text]],
       classOf[Map],
       classOf[Reduce],
-      firstLine = firstLine
+      firstLine = firstLine,
+      inputPath = inputPath,
+      outputPath = s"$outputPath/$jobName.csv"
     )

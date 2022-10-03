@@ -1,18 +1,16 @@
 package HelperUtils
 
 import com.mifmif.common.regex.Generex
-
-import scala.util.Random
-import dk.brics.automaton.RegExp
-import dk.brics.automaton.State
-import dk.brics.automaton.Transition
+import dk.brics.automaton.{RegExp, State, Transition}
 import org.apache.hadoop.io.Text
 
+import java.io.File
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import scala.beans.BeanProperty
 import scala.annotation.tailrec
+import scala.beans.BeanProperty
 import scala.collection.mutable
+import scala.util.Random
 import scala.util.matching.Regex
 
 /**
@@ -23,6 +21,33 @@ object HelperFunctions {
 
         private val timeRegexp = new Regex(Parameters.timeRegexp)
         private val messageTypes = new Regex(Parameters.messageTypes)
+
+        /**
+         * This method deletes the directory "file" recursively
+         *
+         * @param file the file / directory to delete recursively
+         */
+        def deleteRecursively(file: File): Unit =
+                if (file.isDirectory) {
+                        file.listFiles.foreach(deleteRecursively)
+                }
+                if (file.exists && !file.delete) {
+                        throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
+                }
+        end deleteRecursively
+
+
+        /**
+         * this function creates a directory
+         *
+         * @param file the path of the directory to create
+         */
+        def createDirectory(file: String): Unit =
+
+                val dir = new File(file)
+                dir.mkdir()
+        end createDirectory
+
 
         /**
          * function that extends a string from size 'n' to size 'n + size' with zeroes at the beginning of it
@@ -72,7 +97,8 @@ object HelperFunctions {
 
                 val intString = (0 until length).toArray
                   .map(int => {
-                          if int <= firstPositiveValue then Random.between(startTimestamp(int), endTimestamp(int))
+                          if int < firstPositiveValue then startTimestamp(int)
+                          else if int == firstPositiveValue then Random.between(startTimestamp(int), endTimestamp(int))
                           else Random.between(startTimestamp(int), maxValues(int))
                   })
                   .map(_.toString)

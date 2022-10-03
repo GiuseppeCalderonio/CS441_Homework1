@@ -25,8 +25,8 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
   private val outputFormatClass = classOf[TextOutputFormat[Text, IntWritable]]
   private val mapperClass = classOf[MapReducers.ErrorTimeIntervalsMapReducer.Map]
   private val reducerClass = classOf[MapReducers.ErrorTimeIntervalsMapReducer.Reduce]
-  private val inputPath = "log/" + jobName
-  private val outputPath = jobName
+  private val inputPath = s"log/$jobName"
+  private val outputPath = s"log_output/$jobName"
   private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
@@ -37,7 +37,7 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file with 3 log messages, without even an error one
 
@@ -72,7 +72,7 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file with 4 log error messages, two that match with the specified regexp pattern, and 2 no
 
@@ -112,7 +112,7 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
 
     // delete, if exists, the input file
 
-    MapReducers.MapReducerJob.deleteRecursively(new File(inputPath))
+    HelperUtils.HelperFunctions.deleteRecursively(new File(inputPath))
 
     // create a new input file with tree messages for each time interval all of type error,
     // three that belong to time intervals but one without regexp pattern, and one that does not belong to time intervals
