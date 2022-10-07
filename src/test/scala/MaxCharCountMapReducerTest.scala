@@ -26,11 +26,24 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
   private val reducerClass = classOf[MapReducers.MaxCharCountMapReduce.Reduce]
   private val inputPath = s"log/$jobName"
   private val outputPath = s"log_output/$jobName"
-  private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
   private val testTimeIntervals = Parameters.testTimeIntervals
   private val messageTypes = Parameters.messageTypes.replace("(", "").replace(")", "").replace("|", ",")
+
+  def runTestJob(): String =
+    MapReducers.MapReducerJob.runJob(
+      jobName = jobName,
+      outputValueClass = outputValueClass,
+      outputFormatClass = outputFormatClass,
+      mapperClass = mapperClass,
+      reducerClass = reducerClass,
+      inputPath = inputPath,
+      outputPath = outputPath + "TEST",
+      nMappers = "1",
+      nReducers = "1",
+      isTest = true
+    )
 
   it should "Output the number of characters of the message with maximum characters for each message type log regardless of the time intervals and pattern regexp matching" in{
 
@@ -64,16 +77,7 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
 
     // execute the job
 
-    val outputLines = MapReducers.MapReducerJob.runJob(
-      jobName = jobName,
-      outputValueClass = outputValueClass,
-      outputFormatClass = outputFormatClass,
-      mapperClass = mapperClass,
-      reducerClass = reducerClass,
-      inputPath = inputPath,
-      outputPath = outputPath,
-      tempOutputPath = tempOutputPath
-    ).split("\n")
+    val outputLines = runTestJob().split("\n")
 
     // verify if the output matches with the expected output
 
@@ -82,7 +86,5 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
     outputLines should be(output)
 
   }
-
-
 
 }

@@ -137,17 +137,16 @@ object StatisticalMapReducer :
    * @return the output of the job as a string
    */
   def run(inputPath : String, outputPath : String): String =
-
-    // first line of the csv file to show
-    val firstLine = "MessageType" + "," + Parameters.timeIntervals.map( t => "belonging to [" + t._1 + ";" + t._2 + "]").reduce( (s1, s2)  => s1 + "," + s2 )
-    val jobName = this.getClass.getName.replace("$", "")
+  
+    val jobName = this.getClass.getName
 
     runJob(jobName,
       classOf[Text],
       classOf[TextOutputFormat[Text, Text]],
       classOf[Map],
       classOf[Reduce],
-      firstLine = firstLine,
       inputPath = inputPath,
-      outputPath = s"$outputPath/$jobName.csv"
+      outputPath = s"$outputPath/$jobName/",
+      nMappers = Parameters.nMappers,
+      nReducers = Parameters.nReducers
     )

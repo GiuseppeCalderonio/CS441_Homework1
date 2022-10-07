@@ -1,6 +1,5 @@
 package HelperUtils
 
-import HelperUtils.ReadProperties.PropFileReader
 import com.typesafe.config.Config
 
 import java.time.LocalTime

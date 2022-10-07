@@ -24,11 +24,24 @@ class TypeCounterMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
   private val reducerClass = classOf[MapReducers.TypeCounterMapReducer.Reduce]
   private val inputPath = s"log/$jobName"
   private val outputPath = s"log_output/$jobName"
-  private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
   private val testTimeIntervals = Parameters.testTimeIntervals
   private val messageTypes = Parameters.messageTypes.replace("(", "").replace(")", "").replace("|", ",")
+
+  def runTestJob(): String =
+    MapReducers.MapReducerJob.runJob(
+      jobName = jobName,
+      outputValueClass = outputValueClass,
+      outputFormatClass = outputFormatClass,
+      mapperClass = mapperClass,
+      reducerClass = reducerClass,
+      inputPath = inputPath,
+      outputPath = outputPath + "TEST",
+      nMappers = "1",
+      nReducers = "1",
+      isTest = true
+    )
 
   it should "Count the number of generated error messages regardless of the time interval and pattern regexp matching" in {
 
@@ -59,16 +72,7 @@ class TypeCounterMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
 
     // execute the job
 
-    val outputLines = MapReducers.MapReducerJob.runJob(
-      jobName = jobName,
-      outputValueClass = outputValueClass,
-      outputFormatClass = outputFormatClass,
-      mapperClass = mapperClass,
-      reducerClass = reducerClass,
-      inputPath = inputPath,
-      outputPath = outputPath,
-      tempOutputPath = tempOutputPath
-    ).split("\n")
+    val outputLines = runTestJob().split("\n")
 
     // verify if the output matches with the expected output
 

@@ -100,16 +100,16 @@ object ErrorTimeIntervalsMapReducer :
    */
   def run(inputPath : String, outputPath : String): String =
 
-    // first line of the csv file to show
-    val firstLine = "Time Interval, error messages"
-    val jobName = this.getClass.getName.replace("$", "")
+
+    val jobName = this.getClass.getName
 
     runJob(jobName,
       classOf[IntWritable],
       classOf[TextOutputFormat[Text, IntWritable]],
       classOf[Map],
       classOf[Reduce],
-      firstLine = firstLine,
       inputPath = inputPath,
-      outputPath = s"$outputPath/$jobName.csv"
+      outputPath = s"$outputPath/$jobName",
+      nMappers = Parameters.nMappers,
+      nReducers = Parameters.nReducers
     )

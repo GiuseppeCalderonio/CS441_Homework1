@@ -10,21 +10,25 @@ val typesafeConfigVersion = "1.4.2"
 val apacheCommonIOVersion = "2.11.0"
 val scalacticVersion = "3.2.9"
 val generexVersion = "1.0.2"
+val hadoopVersion = "3.2.1"
 
 resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= Seq(
+
   "ch.qos.logback" % "logback-core" % logbackVersion,
   "ch.qos.logback" % "logback-classic" % logbackVersion,
   "org.slf4j" % "slf4j-api" % sfl4sVersion,
+
+
   "com.typesafe" % "config" % typesafeConfigVersion,
   "org.scalactic" %% "scalactic" % scalacticVersion,
   "org.scalatest" %% "scalatest" % scalacticVersion % Test,
   "org.scalatest" %% "scalatest-featurespec" % scalacticVersion % Test,
   "com.github.mifmif" % "generex" % generexVersion,
-  "org.apache.hadoop" % "hadoop-common" % "2.10.1",
-  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "2.10.1",
-  "org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % "2.10.1"
+  "org.apache.hadoop" % "hadoop-common" % hadoopVersion,
+  "org.apache.hadoop" % "hadoop-mapreduce-client-core" % hadoopVersion,
+  "org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % hadoopVersion
 )
 
 assemblyMergeStrategy in assembly := {

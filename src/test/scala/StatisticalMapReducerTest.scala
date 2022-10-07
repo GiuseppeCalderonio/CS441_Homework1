@@ -33,12 +33,25 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
   private val reducerClass = classOf[MapReducers.StatisticalMapReducer.Reduce]
   private val inputPath = s"log/$jobName"
   private val outputPath = s"log_output/$jobName"
-  private val tempOutputPath = jobName
 
   private val timeIntervals = Parameters.timeIntervals
   private val testTimeIntervals = Parameters.testTimeIntervals
   private val head = timeIntervals.head
   private val messageTypes = Parameters.messageTypes.replace("(", "").replace(")", "").replace("|", ",")
+
+  def runTestJob(): String =
+    MapReducers.MapReducerJob.runJob(
+      jobName = jobName,
+      outputValueClass = outputValueClass,
+      outputFormatClass = outputFormatClass,
+      mapperClass = mapperClass,
+      reducerClass = reducerClass,
+      inputPath = inputPath,
+      outputPath = outputPath + "TEST",
+      nMappers = "1",
+      nReducers = "1",
+      isTest = true
+    )
 
   it should "Execute the job and report that for each type of message, three of them match with the regexp pattern" in{
 
@@ -63,16 +76,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
     // execute the job
 
     // this is expected to have 3 lines
-    val outputLines = MapReducers.MapReducerJob.runJob(
-      jobName = jobName,
-      outputValueClass = outputValueClass,
-      outputFormatClass = outputFormatClass,
-      mapperClass = mapperClass,
-      reducerClass = reducerClass,
-      inputPath = inputPath,
-      outputPath = outputPath,
-      tempOutputPath = tempOutputPath
-    ).split("\n")
+    val outputLines = runTestJob().split("\n")
 
     // verify if the output matches with the expected output
 
@@ -112,16 +116,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
 
     // execute the job
 
-    val outputLines = MapReducers.MapReducerJob.runJob(
-      jobName = jobName,
-      outputValueClass = outputValueClass,
-      outputFormatClass = outputFormatClass,
-      mapperClass = mapperClass,
-      reducerClass = reducerClass,
-      inputPath = inputPath,
-      outputPath = outputPath,
-      tempOutputPath= tempOutputPath
-    ).split("\n")
+    val outputLines = runTestJob().split("\n")
 
     // verify if the output matches with the expected output
 
