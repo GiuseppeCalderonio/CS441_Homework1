@@ -1,7 +1,7 @@
 
 package MapReducers
 
-import HelperUtils.HelperFunctions.filterLogMessagesOnly
+import HelperUtils.HelperFunctions.{filterLogMessagesOnly, getStringFromTimestamp}
 import HelperUtils.Parameters
 import MapReducers.MapReducerJob.runJob
 import MapReducers.StatisticalMapReducer.{Map, Reduce}
@@ -52,19 +52,22 @@ object ErrorTimeIntervalsMapReducer :
     private val messageTypes = new Regex(Parameters.messageTypes)
 
 
+    
+
+    def belongsTo(timestamp: String, timeInterval: (LocalTime, LocalTime)): Boolean = {
+      val p = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+
+      if (LocalTime.parse(timestamp, p).isAfter(timeInterval._1) &&
+        !LocalTime.parse(timestamp, p).isAfter(timeInterval._2)) {
+        true
+      } else false
+
+    }
+
+
 
     @throws[IOException]
     def map(key: LongWritable, value: Text, output: OutputCollector[Text, IntWritable], reporter: Reporter): Unit =
-
-      def belongsTo(timestamp: String, timeInterval : (LocalTime, LocalTime)): Boolean = {
-        val p = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
-
-        if (LocalTime.parse(timestamp, p).isAfter(timeInterval._1) &&
-          !LocalTime.parse(timestamp, p).isAfter(timeInterval._2)) {
-          true
-        }else false
-
-      }
 
       filterLogMessagesOnly(value)
         .filter(messageTypes.findFirstIn(_).get.matches("ERROR")) // Filter for error messages only
@@ -73,7 +76,7 @@ object ErrorTimeIntervalsMapReducer :
 
           timeIntervals.filter(belongsTo(timeRegexp.findFirstIn(line).get, _))
             .foreach( (start, end) =>
-              stringTimeInterval.set( "[ " + start.toString + " ; " + end.toString + " ] ")
+              stringTimeInterval.set( "[ " + getStringFromTimestamp(start) + " ; " + getStringFromTimestamp(end) + " ] ")
               output.collect(stringTimeInterval, one)
             )
         }

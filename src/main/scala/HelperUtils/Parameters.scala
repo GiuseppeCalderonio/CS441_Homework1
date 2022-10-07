@@ -80,7 +80,7 @@ object Parameters :
    */
   private def getStringListSafe(stringListName : String): List[String] =
     Try(config.getStringList(s"$configName.$stringListName").asScala.toList) match {
-      case Success(value) => value.sorted // this line automatically sorts the list in such a way that timestamps are sorted as a consequence
+      case Success(value) => value
       case Failure(_) => logger.error(s"No config parameter $stringListName is provided")
         throw new IllegalArgumentException(s"No config data for $stringListName")
     }

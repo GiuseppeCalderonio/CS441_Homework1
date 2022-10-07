@@ -1,4 +1,4 @@
-import HelperUtils.HelperFunctions.{areSortedTimeIntervals, generate, generateRandomTimestamp}
+import HelperUtils.HelperFunctions.{areSortedTimeIntervals, generate, generateRandomTimestamp, getStringFromTimestamp, verifyTimeIntervals}
 import HelperUtils.Parameters
 import MapReducers.ErrorTimeIntervalsMapReducer
 import org.apache.hadoop.io.{IntWritable, Text}
@@ -97,7 +97,7 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
 
     // verify if the output matches with the expected output
 
-    val output = Array("", "[ " + timeIntervals.head._1 + " ; " + timeIntervals.head._2 + " ] ,2")
+    val output = Array("[ " + getStringFromTimestamp(timeIntervals.head._1) + " ; " + getStringFromTimestamp(timeIntervals.head._2) + " ] ,2")
 
     outputLines should be(output)
 
@@ -132,9 +132,9 @@ class ErrorTimeIntervalsMapReducerTest extends AnyFlatSpec with Matchers with Pr
 
     // verify if the output matches with the expected output
 
-    val output = Array("").concat(timeIntervals.map( t =>  "[ " + t._1.toString + " ; " + t._2.toString + " ] ,2"  ).toArray)
+    val output = timeIntervals.map( t =>  "[ " + getStringFromTimestamp(t._1) + " ; " + getStringFromTimestamp(t._2) + " ] ,2"  ).toArray
 
-    areSortedTimeIntervals(timeIntervals) should be(true)
+    verifyTimeIntervals(outputLines) should be(true)
 
     outputLines should be(output)
 

@@ -81,7 +81,7 @@ class TypeCounterMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
     val output2 = "INFO," + (timeIntervals.length * 4).toString
     val output3 = "WARN," + (timeIntervals.length * 4).toString
 
-    val output = Array("", output0, output1, output2, output3)
+    val output = Array(output0, output1, output2, output3)
 
     outputLines should be(output)
 

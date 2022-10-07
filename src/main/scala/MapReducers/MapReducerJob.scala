@@ -35,8 +35,7 @@ object MapReducerJob :
       return ""
     }
 
-    val outputLines = "\n"
-      + source.getLines().toArray.reduce((l1, l2) => l1 + "\n" + l2)
+    val outputLines = source.getLines().toArray.reduce((l1, l2) => l1 + "\n" + l2)
 
     source.close()
 

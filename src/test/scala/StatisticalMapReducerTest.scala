@@ -84,7 +84,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
     val output1 = "INFO,1," + (0 until timeIntervals.length - 1).map(_ => "0").reduce( (s1, s2) => s1 + "," + s2 )
     val output2 = "WARN,1," + (0 until timeIntervals.length - 1).map(_ => "0").reduce( (s1, s2) => s1 + "," + s2 )
 
-    val output = Array("", output0, output1, output2)
+    val output = Array(output0, output1, output2)
 
     outputLines should be(output)
   }
@@ -125,7 +125,7 @@ class StatisticalMapReducerTest extends AnyFlatSpec with Matchers with PrivateMe
     val output2 = "INFO," + timeIntervals.indices.map(_ => "1").reduce((s1, s2) => s1 + "," + s2 )
     val output3 = "WARN," + timeIntervals.indices.map(_ => "1").reduce((s1, s2) => s1 + "," + s2 )
 
-    val output = Array("", output0, output1, output2, output3)
+    val output = Array(output0, output1, output2, output3)
 
     outputLines should be(output)
   }

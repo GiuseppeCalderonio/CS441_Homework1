@@ -81,7 +81,7 @@ class MaxCharCountMapReducerTest extends AnyFlatSpec with Matchers with PrivateM
 
     // verify if the output matches with the expected output
 
-    val output = Array("").concat( messageTypes.split(",").zip(maxChars).map( m_c => m_c._1 + "," + m_c._2.toString ) )
+    val output = messageTypes.split(",").zip(maxChars).map( m_c => m_c._1 + "," + m_c._2.toString )
 
     outputLines should be(output)
 

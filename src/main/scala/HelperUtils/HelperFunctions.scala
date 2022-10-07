@@ -22,6 +22,16 @@ object HelperFunctions {
         private val timeRegexp = new Regex(Parameters.timeRegexp)
         private val messageTypes = new Regex(Parameters.messageTypes)
 
+
+        /**
+         * this function returns a string given a timestamp
+         * @param timestamp the timestamp to convert
+         * @return the string from the timestamp
+         */
+        def getStringFromTimestamp(timestamp: LocalTime): String =
+                val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+                timestamp.format(formatter);
+
         /**
          * This method deletes the directory "file" recursively
          *
@@ -62,13 +72,27 @@ object HelperFunctions {
                 str
 
         /**
+         * this function verifies if a set of log lines are sorted for time intervals
+         * @param outLines this array of strings represents the log lines
+         * @return true if the lines are sorted by timestamp, false otherwise
+         */
+        def verifyTimeIntervals(outLines : Array[String]): Boolean =
+                val p = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+                val timeInterval = outLines
+                  .filterNot(s => s.isEmpty)
+                  .map( line => (
+                    LocalTime.parse(timeRegexp.findAllIn(line).toList.head, p),
+                    LocalTime.parse(timeRegexp.findAllIn(line).toList(1), p)
+                    )).toList
+                areSortedTimeIntervals(timeInterval)
+        /**
          * function that verifies if a set of time intervals is sorted
-         * for example , [ ( 1, 2) , (3, 4) ] is because 2 < 3
-         *              [ (1, 2) , (1.5, 6) ] is not because 2 > 1.5
+         * for example , [ ( 1, 2) , (3, 4) ] is because 2 is less than 3,
+         *              [ (1, 2) , (1.5, 6) ] is not because 2 is greater than 1.5
          * @param timeIntervals the set of time intervals to verify
          * @return true if the time intervals are sorted, false otherwise
          */
-        def areSortedTimeIntervals(timeIntervals: List[(LocalTime, LocalTime)]): Boolean =
+        private def areSortedTimeIntervals(timeIntervals: List[(LocalTime, LocalTime)]): Boolean =
                 (0 until timeIntervals.length - 1)
                   .map(i => timeIntervals(i)._2.isBefore(timeIntervals(i + 1)._1))
                   .reduce((b1, b2) => b1 && b2)
