@@ -11,8 +11,8 @@
             <!-- Daily rollover -->
             <fileNamePattern>log/LogFileGenerator.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 
-            <maxFileSize>1KB</maxFileSize>
-            <maxHistory>100</maxHistory>
+            <maxFileSize>1GB</maxFileSize>
+            <maxHistory>15</maxHistory>
         </rollingPolicy>
 
         <encoder>

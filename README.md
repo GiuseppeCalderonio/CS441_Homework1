@@ -1,5 +1,10 @@
 # CS-441 HOMEWORK 1
 
+* First Name : Giuseppe
+* Last name : Calderonio
+* UIC email : gcalde22@uic.edu
+* UIN: 679346611
+
 ## Introduction
 This repository contains the implementation of a map reduce
 program implemented with the Hadoop framework (Book option 1), and specifically 
