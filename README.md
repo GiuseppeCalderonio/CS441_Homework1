@@ -400,7 +400,7 @@ and click _Create bucket_, give it a name (i.e. TEST).
 Then upload there the jar file previously created
 and the input directory containing log files.
 
-### Run an EMR cluster
+#### Run an EMR cluster
 
 This step consists on actually run the jar
 file on the cloud in a distributed environment.
@@ -431,7 +431,7 @@ and then select all the default configurations
 After 5-10 minutes of deployment, in your s3 bucket
 the aggregated results should be visible.
 
-### ERM From intellij
+### EMR From intellij
 
 The deployment part can be also managed 
 from intellij using the [Big Data Tool](https://www.jetbrains.com/help/idea/big-data-tools-support.html)
