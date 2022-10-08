@@ -434,7 +434,7 @@ the aggregated results should be visible.
 ### ERM From intellij
 
 The deployment part can be also managed 
-from intellij using the
+from intellij using the [Big Data Tool](https://www.jetbrains.com/help/idea/big-data-tools-support.html)
 
 More info can be found in this [youtube video](https://youtu.be/xn4M0JpCU54)
 
