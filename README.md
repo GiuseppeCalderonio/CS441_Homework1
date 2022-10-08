@@ -4,6 +4,7 @@
 * Last name : Calderonio
 * UIC email : gcalde22@uic.edu
 * UIN: 679346611
+* deployment video on youtube : [https://youtu.be/xn4M0JpCU54](https://youtu.be/xn4M0JpCU54)
 
 ## Introduction
 This repository contains the implementation of a map reduce
@@ -353,4 +354,11 @@ and then select all the default configurations
 
 After 5-10 minutes of deployment, in your s3 bucket
 the aggregated results should be visible.
+
+## From intellij
+
+The deployment part can be aslo managed 
+from intellij using the
+
+More info can be found in this [youtube video](https://youtu.be/xn4M0JpCU54)
 
