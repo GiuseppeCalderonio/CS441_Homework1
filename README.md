@@ -458,3 +458,6 @@ The main limitations of the project are :
  jar needs to be created from scratch
 * The format of the output is not on _.csv_, and there is
  no first row description of the output format
+* In order to keep mappers and reducers in the same object class,
+ some code replication may be present because same reducers were 
+ implemented more than once
