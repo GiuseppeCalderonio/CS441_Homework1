@@ -65,6 +65,28 @@ file that is
 used in that project is reported; it indeed
 divides the files in shards, where each shard size 
 is specified by the ```<maxFileSize>``` tag.
+Specifically, in the [video](https://youtu.be/xn4M0JpCU54)
+the input file of 10,000 lines was divided in 12 files
+of 100 KB each.
+
+### Inputs
+
+The input of the program can be any file, indeed there is no 
+specific requirement about the file format, since each mapper,
+before starting executing the function, filters each
+line that does not match a log message structure.
+
+However, this can increase the overhead time of the jobs, especially
+when there is a big workload : this is indeed a limitation.
+
+The input directory should be passed when the application is run.
+
+### Outputs
+
+The output of the program is a directory, that contains other 4 
+subDirectories, each one associated with a job.
+
+The output directory should be passed when the application is run.
 
 ### Jobs
 
@@ -111,16 +133,37 @@ match the regex pattern **AND** that belong to the
 _i-th_ time interval, while the first column specifies
 the type of the message (ERROR, INFO, DEBUG, WARN).
 
-For example, if 
-* timestamp = 3.5 INFO
-* timeInterval = [(1, 2), (2, 3), (3, 4), (4, 5)]
+For example, if the input log file is :
+```
+19:29:33.794 [] DEBUG test - pattern 1
+12:42:20.240 [] INFO test - pattern 2
+03:22:50.923 [] WARN test - not matches
+```
 
-the resulting output will be in the form 
-* INFO, 0, 0, 1, 0
+and the timeInterval configuration parameter is 
+```
+[(00:00:00.000, 06:00:00.000) ,
+ (08:00:00.001, 12:00:00.000) ,
+ (12:00:00.001, 18:00:00.000),
+ (18:00:00.001, 23:59:59.999) ] 
+```
 
-because the timestamp belongs to the third timeInterval
-(assuming that the message matches with the
-regex pattern).
+and the regex pattern is 
+```
+ "pattern"
+```
+Then the output will be in the form :
+
+```
+INFO,0,0,0,1
+DEBUG,0,0,1,0
+```
+
+because the timestamp of the DEBUG message
+belongs to the fourth timeInterval and the 
+timestamp of the INFO message belongs to the third
+, while the WARN message does not match with the 
+regex pattern, so it is not considered
 
 #### Second task
 
@@ -145,12 +188,34 @@ This task may be interpreted in 2 ways :
 For the project, the first one was interpreted as
 the correct one.
 
-For example, if
-* timestamp = 3.5 ERROR
-* timeInterval = [(1, 2), (2, 3), (3, 4), (4, 5)]
 
-the resulting output will be in the form
-* [3, 4], 1
+
+For example, if
+
+```
+19:29:33.794 [] ERROR test - pattern 1
+12:42:20.240 [] ERROR test - pattern 2
+00:00:32.946 [] ERROR test - not matches
+```
+
+and the timeInterval configuration parameter is
+```
+[(00:00:00.000, 06:00:00.000) ,
+ (08:00:00.001, 12:00:00.000) ,
+ (12:00:00.001, 18:00:00.000),
+ (18:00:00.001, 23:59:59.999) ] 
+```
+
+and the regex pattern is
+```
+ "pattern"
+```
+
+Then the output will have the following format
+```
+ [12:00:00.001; 18:00:00.000],1
+ [18:00:00.001; 23:59:59.999],1
+```
 
 Differently from the previous case, if a time
 interval does not have any error message
@@ -187,12 +252,18 @@ message type in the input file.
 
 For example, if the input file is
 ```
-19:29:33.794 [] DEBUG test - test 1
-12:42:20.240 [] INFO test - test 2
-19:27:01.228 [] ERROR test - test 3
-13:37:31.395 [] DEBUG test - test 4
-18:37:31.395 [] INFO test - test 5
+19:29:33.794 [] DEBUG test - pattern 1
+12:42:20.240 [] INFO test - pattern 2
+19:27:01.228 [] ERROR test - pattern 3
+13:37:31.395 [] DEBUG test - pattern 4
+18:37:31.395 [] INFO test - pattern 5
 ```
+
+and the regex pattern is
+```
+ "pattern"
+```
+
 then the output file (assuming only one mapper)
 will look like
 
@@ -229,11 +300,16 @@ won't show a row at all for that message type.
 
 For example, if the input file is :
 ```
-19:29:33.794 [] DEBUG test - test a
-12:42:20.240 [] DEBUG test - test aa
-19:27:01.228 [] DEBUG test - test aaaaaaa
-13:37:31.395 [] DEBUG test - test aa
-18:37:31.395 [] DEBUG test - test aaa
+19:29:33.794 [] DEBUG test - pattern a
+12:42:20.240 [] DEBUG test - pattern aa
+19:27:01.228 [] DEBUG test - pattern aaaaaaa
+13:37:31.395 [] DEBUG test - pattern aa
+18:37:31.395 [] DEBUG test - pattern aaa
+```
+
+and the regex pattern is
+```
+ "pattern"
 ```
 
 The output file will be
@@ -350,15 +426,35 @@ click _Add_
 and then select all the default configurations
 
 
-### See the resulting outputs
+#### See the resulting outputs
 
 After 5-10 minutes of deployment, in your s3 bucket
 the aggregated results should be visible.
 
-## From intellij
+### ERM From intellij
 
-The deployment part can be aslo managed 
+The deployment part can be also managed 
 from intellij using the
 
 More info can be found in this [youtube video](https://youtu.be/xn4M0JpCU54)
 
+## Limitations
+
+The main limitations of the project are :
+
+* Since there are no assumptions on the input file, an additional
+ filtering step at the beginning of each mapper is introduced, however
+ this implies a time overhead
+* Some assumptions are made on the configuration parameters, such as that
+ the time intervals need to be sorted and correctly configured
+  (each string at the _i-th_ position of the _startTimeInterval_
+ config parameter should be less than the
+ string at the _i-th_ position of the _endingTimeInterval_
+  config parameter)
+ , or that the testing time intervals should not overlap among 
+ each other (also these ones may have been automatically created)
+* Once the jar is created and a configuration parameter changes,
+ instead of changing just the content of a config file, the 
+ jar needs to be created from scratch
+* The format of the output is not on _.csv_, and there is
+ no first row description of the output format
